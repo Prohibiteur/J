@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vzdre Pro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Header */
+    #header {
+      background: #0a0a0a;
+      padding: 12px 15px;
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    #menuBtn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    #title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+    
+    #channelInfo {
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+    }
+    
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      left: -100%;
+      top: 0;
+      width: 85%;
+      max-width: 350px;
+      height: 100vh;
+      background: #0a0a0a;
+      z-index: 9999;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      border-right: 1px solid #1a1a1a;
+    }
+    
+    #sidebar.open { left: 0; }
+    
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 9998;
+      display: none;
+    }
+    
+    #overlay.show { display: block; }
+    
+    .sidebar-section {
+      padding: 15px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    
+    .sidebar-title {
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Main */
+    #mainContent {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    #chatArea {
+      flex: 1;
+      background: #000;
+      padding: 15px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+    
+    .message {
+      margin-bottom: 8px;
+      padding: 8px 10px;
+      background: #0a0a0a;
+      border-radius: 6px;
+      border-left: 2px solid #1a1a1a;
+      animation: slideIn 0.2s ease;
+    }
+    
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    
+    .username {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    .timestamp {
+      color: #666;
+      font-size: 10px;
+      font-weight: 400;
+    }
+    
+    .message-content {
+      color: #ccc;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    
+    .message-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 6px;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    
+    .message-image:hover {
+      transform: scale(1.02);
+    }
+    
+    .message-attachment {
+      display: inline-block;
+      background: #1a1a1a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      border: 1px solid #2a2a2a;
+    }
+    
+    .message-attachment:hover {
+      background: #2a2a2a;
+    }
+    
+    .system-msg {
+      background: #1a1a1a;
+      border-left-color: #666;
+    }
+    
+    .system-msg .username { color: #999; }
+    
+    .other-user {
+      background: #0a0a0a;
+      border-left-color: #fff;
+    }
+    
+    .other-user .username { color: #fff; }
+    
+    .my-message {
+      background: #0a0a0a;
+      border-left-color: #666;
+    }
+    
+    .my-message .username { color: #999; }
+    
+    /* Input */
+    #inputArea {
+      background: #0a0a0a;
+      padding: 15px;
+      border-top: 1px solid #1a1a1a;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    
+    input:focus, textarea:focus {
+      border-color: #fff;
+      outline: none;
+    }
+    
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+    
+    button {
+      width: 100%;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+      opacity: 0.8;
+    }
+    
+    button.active {
+      background: #000;
+      color: #fff;
+      border: 1px solid #fff;
+    }
+    
+    button.danger {
+      background: #f00;
+      color: #fff;
+    }
+    
+    button.warning {
+      background: #ff0;
+      color: #000;
+    }
+    
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .btn-group-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .token-item {
+      background: #1a1a1a;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .token-item.active {
+      border-color: #fff;
+      background: #0a0a0a;
+    }
+    
+    .token-name {
+      font-size: 12px;
+      flex: 1;
+    }
+    
+    .token-status {
+      margin-left: 8px;
+      font-size: 16px;
+    }
+    
+    .small-btn {
+      width: auto;
+      padding: 5px 10px;
+      margin: 0 0 0 5px;
+      font-size: 11px;
+    }
+    
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+      padding: 8px;
+      background: #1a1a1a;
+      border-radius: 6px;
+    }
+    
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0 10px 0 0;
+      accent-color: #fff;
+    }
+    
+    .checkbox-row label {
+      font-size: 12px;
+      flex: 1;
+    }
+    
+    .collapsible {
+      background: #1a1a1a;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .collapsible-content.open {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .list-item {
+      background: #0a0a0a;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .list-item:active {
+      background: #fff;
+      color: #000;
+    }
+    
+    /* Modal */
+    #channelModal, #floodModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 10000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #channelModal.show, #floodModal.show { display: flex; }
+    
+    .modal-content {
+      background: #0a0a0a;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      border: 1px solid #1a1a1a;
+    }
+    
+    .modal-title {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .modal-close {
+      background: #f00;
+      margin-top: 10px;
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    
+    .stat-box {
+      background: #1a1a1a;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      border: 1px solid #2a2a2a;
+    }
+    
+    .stat-value {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .stat-label {
+      font-size: 10px;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    /* Flood List */
+    .flood-item {
+      background: #1a1a1a;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    
+    /* Animations */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .typing-indicator {
+      color: #666;
+      font-style: italic;
+      font-size: 11px;
+      padding: 8px;
+      background: #0a0a0a;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    /* Speed indicator */
+    .speed-mode {
+      background: #0f0;
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-block;
+      margin-left: 5px;
+    }
+    
+    .raid-section {
+      background: #1a0000;
+      border: 1px solid #f00;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header">
+    <button id="menuBtn" onclick="toggleMenu()">☰</button>
+    <div>
+      <div id="title">VZDRE PRO</div>
+      <div id="channelInfo">No channel</div>
+    </div>
+    <div style="width: 50px;"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="overlay" onclick="toggleMenu()"></div>
+  <div id="sidebar">
+    <!-- Tokens -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">🔐 TOKENS</div>
+      <input id="tokenInput" type="text" placeholder="Discord token..." />
+      <input id="tokenName" type="text" placeholder="Name (optional)" />
+      <button onclick="addToken()">➕ Add Token</button>
+      
+      <textarea id="bulkTokens" placeholder="Bulk tokens (one per line)..." style="min-height: 60px; margin-top: 8px;"></textarea>
+      <button onclick="addBulkTokens()">📥 Bulk Import</button>
+      
+      <div id="tokenList"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">📋 NAVIGATION</div>
+      <button onclick="loadGuilds()">🏠 Load Servers</button>
+      <button onclick="loadDMs()">💬 Load DMs</button>
+      
+      <div class="collapsible" onclick="toggleCollapsible(this)">📁 Servers ▼</div>
+      <div class="collapsible-content" id="guildList"></div>
+      
+      <div class="collapsible" onclick="toggleCollapsible(this)">💬 DMs ▼</div>
+      <div class="collapsible-content" id="dmList"></div>
+    </div>
+
+    <!-- Flood System -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">⚡ FLOOD SYSTEM</div>
+      <button onclick="openFloodModal()">📝 Manage Flood List</button>
+      <button onclick="toggleFloodMode()" id="floodModeBtn">▶️ Start Flood</button>
+      
+      <label style="font-size: 11px; color: #666; margin: 8px 0; display: block;">
+        Ping Multiplier: <span id="pingMultValue">1</span>x
+      </label>
+      <input type="range" id="pingMultRange" min="1" max="10" value="1" style="margin: 0 0 8px 0;" />
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="randomFromList" checked />
+        <label for="randomFromList">📋 Random from list</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="varyPingCount" checked />
+        <label for="varyPingCount">🎲 Vary ping count</label>
+      </div>
+    </div>
+
+    <!-- MEV System -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">⚡ MEV SPEED</div>
+      <button onclick="toggleMEVMode()" id="mevBtn">🚀 MEV Mode OFF</button>
+      
+      <label style="font-size: 11px; color: #666; margin: 8px 0; display: block;">
+        MEV Speed: <span id="mevSpeedValue">0</span>ms
+      </label>
+      <input type="range" id="mevSpeedRange" min="0" max="50" value="0" style="margin: 0;" />
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="instantSend" />
+        <label for="instantSend">⚡ Instant Send</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="preSendTyping" checked />
+        <label for="preSendTyping">✍️ Pre-send Typing</label>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">⚙️ OPTIONS</div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="sendAllTokens" />
+        <label for="sendAllTokens">🔥 All tokens</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="letterByLetter" />
+        <label for="letterByLetter">✍️ Letter by letter</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="ghostMode" />
+        <label for="ghostMode">👻 Ghost mode</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="antiSpamDetect" />
+        <label for="antiSpamDetect">🛡️ Anti-detection</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="messageVariation" />
+        <label for="messageVariation">🔀 Msg variation</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="autoReact" />
+        <label for="autoReact">⚡ Auto react</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="autoRotate" />
+        <label for="autoRotate">🔄 Auto rotate tokens</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="showImages" checked />
+        <label for="showImages">🖼️ Show images</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="autoDownload" />
+        <label for="autoDownload">💾 Auto download images</label>
+      </div>
+    </div>
+
+    <!-- Raid -->
+    <div class="sidebar-section raid-section">
+      <div class="sidebar-title">💀 RAID TOOLS</div>
+      <div class="btn-group">
+        <button onclick="scanServer()">🔍 Scan</button>
+        <button onclick="massMention()">👥 Mass @</button>
+      </div>
+      <div class="btn-group">
+        <button onclick="multiChannelSpam()">🌊 Multi CH</button>
+        <button onclick="massReactSpam()">⚡ React Spam</button>
+      </div>
+      <div class="btn-group">
+        <button onclick="spamImages()">🖼️ Image Spam</button>
+        <button onclick="downloadAllImages()">💾 DL All Imgs</button>
+      </div>
+      <button onclick="nukeChannel()" class="danger">💣 NUKE</button>
+      <button onclick="raidServer()" class="danger">☠️ RAID SERVER</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">📊 STATS</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value" id="msgCount">0</div>
+          <div class="stat-label">Messages</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="tokenCount">0</div>
+          <div class="stat-label">Tokens</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="sessionTime">0m</div>
+          <div class="stat-label">Session</div>
+        </div>
+      </div>
+      <button onclick="resetStats()">🔄 Reset</button>
+      <button onclick="exportLogs()">💾 Export Logs</button>
+    </div>
+  </div>
+
+  <!-- Flood Modal -->
+  <div id="floodModal">
+    <div class="modal-content">
+      <div class="modal-title">📋 Flood Message List</div>
+      <textarea id="floodListInput" placeholder="Enter messages (one per line)..." style="min-height: 150px;"></textarea>
+      <button onclick="saveFloodList()">💾 Save List</button>
+      <div style="margin: 10px 0; font-size: 12px; color: #666;">
+        Current: <span id="floodCount">0</span> messages
+      </div>
+      <div id="floodListDisplay"></div>
+      <button class="modal-close" onclick="closeFloodModal()">✖ Close</button>
+    </div>
+  </div>
+
+  <!-- Channel Modal -->
+  <div id="channelModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">Select Channel</div>
+      <div id="channelListModal"></div>
+      <button class="modal-close" onclick="closeChannelModal()">✖ Close</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="mainContent">
+    <div id="chatArea"></div>
+    
+    <div id="inputArea">
+      <input id="mentions" type="text" placeholder="Mentions (@everyone, @user...)" />
+      <textarea id="message" placeholder="Your message..."></textarea>
+      
+      <div class="btn-group">
+        <button onclick="sendMessage()">📤 Send</button>
+        <button id="pauseBtn" onclick="togglePause()">⏸️ Pause</button>
+      </div>
+      
+      <div class="btn-group-3">
+        <input type="file" id="spamFile" accept=".txt" style="display: none;" onchange="loadSpamFile(event)" />
+        <button onclick="document.getElementById('spamFile').click()">📄 File</button>
+        <button id="startSpamBtn" onclick="startAutoSpam()" style="display: none;">▶️ Start</button>
+        <button onclick="clearChat()">🗑️ Clear</button>
+      </div>
+      
+      <label style="font-size: 11px; color: #666; margin: 8px 0; display: block;">
+        Speed: <span id="delayValue">50</span>ms | Letter: <span id="letterDelayValue">50</span>ms
+      </label>
+      <input type="range" id="delayRange" min="0" max="2000" value="50" style="margin: 0 0 5px 0;" />
+      <input type="range" id="letterDelayRange" min="10" max="500" value="50" style="margin: 0;" />
+    </div>
+  </div>
+
+  <script>
+    let tokens = [];
+    let activeTokenIndex = 0;
+    let currentDelay = 50;
+    let letterDelay = 50;
+    let mevSpeed = 0;
+    let pingMultiplier = 1;
+    let currentChannelId = null;
+    let currentChannelName = '';
+    let pauseEnvoi = false;
+    let spamLines = [];
+    let floodList = [];
+    let floodMode = false;
+    let mevMode = false;
+    let autoSpamming = false;
+    let nukingChannel = false;
+    let heartbeatIntervals = [];
+    let messageCounter = 0;
+    let deletedMessages = [];
+    let serverData = {};
+    let typingUsers = new Map();
+    let lastMessageId = null;
+    let messageHistory = [];
+    let autoRotateInterval = null;
+    let rotateIndex = 0;
+    let imageUrls = [];
+
+    const invisibleChars = ['\u200B', '\u200C', '\u200D', '\uFEFF'];
+    const emojis = ['❤️', '👍', '😂', '😍', '🔥', '⭐', '💯', '🎉', '✨', '💎'];
+
+    // Auto-rotate tokens
+    function startAutoRotate() {
+      if (autoRotateInterval) return;
+      
+      autoRotateInterval = setInterval(() => {
+        if (!document.getElementById('autoRotate')?.checked) {
+          clearInterval(autoRotateInterval);
+          autoRotateInterval = null;
+          return;
+        }
+        
+        const connectedTokens = tokens.filter(t => t.connected);
+        if (connectedTokens.length === 0) return;
+        
+        rotateIndex = (rotateIndex + 1) % connectedTokens.length;
+        const newToken = connectedTokens[rotateIndex];
+        activeTokenIndex = tokens.indexOf(newToken);
+        renderTokenList();
+        
+        appendMessage('SYSTEM', `🔄 Auto-rotated to: ${newToken.name}`, new Date(), false, true);
+      }, 10000); // Rotation toutes les 10 secondes
+    }
+
+    // Watch auto-rotate checkbox
+    setInterval(() => {
+      if (document.getElementById('autoRotate')?.checked && !autoRotateInterval) {
+        startAutoRotate();
+      }
+    }, 1000);
+
+    // Menu
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('show');
+    }
+
+    function toggleCollapsible(element) {
+      const content = element.nextElementSibling;
+      content.classList.toggle('open');
+      element.textContent = content.classList.contains('open') 
+        ? element.textContent.replace('▼', '▲')
+        : element.textContent.replace('▲', '▼');
+    }
+
+    // Format time
+    function formatTime(date) {
+      return new Date(date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    // Append message
+    function appendMessage(author, content, timestamp = new Date(), isOther = false, isSystem = false, attachments = []) {
+      const chatArea = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      
+      let className = 'message';
+      if (isSystem) className += ' system-msg';
+      else if (isOther) className += ' other-user';
+      else className += ' my-message';
+      
+      div.className = className;
+      
+      let attachmentHTML = '';
+      
+      // Handle attachments (images, files)
+      if (attachments && attachments.length > 0) {
+        attachments.forEach(att => {
+          if (att.content_type?.startsWith('image/') && document.getElementById('showImages')?.checked) {
+            imageUrls.push(att.url);
+            attachmentHTML += `<img src="${att.url}" class="message-image" onclick="window.open('${att.url}', '_blank')" alt="Image" />`;
+            
+            // Auto download
+            if (document.getElementById('autoDownload')?.checked) {
+              downloadImage(att.url, att.filename);
+            }
+          } else {
+            attachmentHTML += `<a href="${att.url}" target="_blank" class="message-attachment">📎 ${att.filename || 'Attachment'}</a>`;
+          }
+        });
+      }
+      
+      div.innerHTML = `
+        <div class="message-header">
+          <span class="username">${author}</span>
+          <span class="timestamp">${formatTime(timestamp)}</span>
+        </div>
+        <div class="message-content">${content}</div>
+        ${attachmentHTML}
+      `;
+      
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      
+      messageHistory.push({ author, content, timestamp, isOther, isSystem, attachments });
+      if (messageHistory.length > 200) messageHistory.shift();
+    }
+
+    // Download image
+    function downloadImage(url, filename) {
+      fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = filename || `image_${Date.now()}.png`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        })
+        .catch(err => console.error('Download error:', err));
+    }
+
+    // Download all images from chat
+    function downloadAllImages() {
+      if (imageUrls.length === 0) {
+        alert("No images to download!");
+        return;
+      }
+      
+      appendMessage('SYSTEM', `💾 Downloading ${imageUrls.length} images...`, new Date(), false, true);
+      
+      imageUrls.forEach((url, index) => {
+        setTimeout(() => {
+          downloadImage(url, `image_${index + 1}.png`);
+        }, index * 500);
+      });
+      
+      appendMessage('SYSTEM', `✅ Downloaded ${imageUrls.length} images`, new Date(), false, true);
+    }
+
+    // Spam images (upload from URL)
+    async function spamImages() {
+      const imageUrl = prompt("Enter image URL to spam:");
+      if (!imageUrl) return;
+      
+      const count = parseInt(prompt("How many times to send?", "5"));
+      if (isNaN(count) || count < 1) return;
+      
+      appendMessage('SYSTEM', `🖼️ Spamming image ${count} times...`, new Date(), false, true);
+      
+      for (let i = 0; i < count; i++) {
+        await realSendMessage(imageUrl, '');
+        await new Promise(resolve => setTimeout(resolve, currentDelay));
+      }
+      
+      appendMessage('SYSTEM', '✅ Image spam complete', new Date(), false, true);
+    }
+
+    function clearChat() {
+      if (confirm("Clear chat?")) {
+        document.getElementById('chatArea').innerHTML = '';
+        messageHistory = [];
+        appendMessage('SYSTEM', 'Chat cleared', new Date(), false, true);
+      }
+    }
+
+    // Tokens
+    function saveTokens() {
+      const tokensData = tokens.map(t => ({ token: t.token, name: t.name }));
+      localStorage.setItem('vzdre_tokens', JSON.stringify(tokensData));
+    }
+
+    function loadTokens() {
+      try {
+        const saved = localStorage.getItem('vzdre_tokens');
+        if (saved) {
+          const tokensData = JSON.parse(saved);
+          tokens = tokensData.map(t => ({ ...t, socket: null, userId: null, connected: false }));
+          renderTokenList();
+          appendMessage('SYSTEM', `${tokens.length} token(s) loaded`, new Date(), false, true);
+          autoConnectTokens();
+        }
+      } catch (err) {
+        console.error('Load error:', err);
+      }
+    }
+
+    function autoConnectTokens() {
+      tokens.forEach((t, index) => {
+        if (!t.connected && t.token) {
+          setTimeout(() => connectToken(index), index * 300);
+        }
+      });
+    }
+
+    async function addToken() {
+      const tokenInput = document.getElementById('tokenInput');
+      const tokenName = document.getElementById('tokenName');
+      const token = tokenInput.value.trim();
+      let name = tokenName.value.trim();
+
+      if (!token) {
+        alert("Token required!");
+        return;
+      }
+
+      try {
+        const user = await fetch('https://discord.com/api/v9/users/@me', {
+          headers: { Authorization: token }
+        }).then(res => res.json());
+
+        if (!user.id) {
+          alert("Invalid token!");
+          return;
+        }
+
+        if (!name) name = `${user.username}#${user.discriminator}`;
+
+        tokens.push({ token, name, socket: null, userId: user.id, connected: false });
+        tokenInput.value = '';
+        tokenName.value = '';
+        
+        connectToken(tokens.length - 1);
+        renderTokenList();
+        saveTokens();
+        appendMessage('SYSTEM', `✅ ${name} added`, new Date(), false, true);
+      } catch (err) {
+        alert("Token error!");
+      }
+    }
+
+    async function addBulkTokens() {
+      const bulkInput = document.getElementById('bulkTokens');
+      const lines = bulkInput.value.trim().split('\n').filter(line => line.trim());
+      
+      if (lines.length === 0) {
+        alert("No tokens!");
+        return;
+      }
+
+      appendMessage('SYSTEM', `Importing ${lines.length} tokens...`, new Date(), false, true);
+      let successCount = 0;
+
+      for (const token of lines) {
+        const trimmedToken = token.trim();
+        if (!trimmedToken) continue;
+
+        try {
+          const user = await fetch('https://discord.com/api/v9/users/@me', {
+            headers: { Authorization: trimmedToken }
+          }).then(res => res.json());
+
+          if (user.id) {
+            const name = `${user.username}#${user.discriminator}`;
+            tokens.push({ token: trimmedToken, name, socket: null, userId: user.id, connected: false });
+            connectToken(tokens.length - 1);
+            successCount++;
+          }
+        } catch (err) {
+          console.error('Import error:', err);
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      bulkInput.value = '';
+      renderTokenList();
+      saveTokens();
+      appendMessage('SYSTEM', `✅ ${successCount} tokens imported`, new Date(), false, true);
+    }
+
+    function renderTokenList() {
+      const list = document.getElementById('tokenList');
+      list.innerHTML = '';
+      
+      tokens.forEach((t, index) => {
+        const div = document.createElement('div');
+        div.className = 'token-item' + (index === activeTokenIndex ? ' active' : '');
+        div.innerHTML = `
+          <span class="token-name">${t.name}</span>
+          <span class="token-status">${t.connected ? '🟢' : '🔴'}</span>
+          <button class="small-btn" onclick="switchToken(${index})">Use</button>
+          <button class="small-btn" onclick="removeToken(${index})">X</button>
+        `;
+        list.appendChild(div);
+      });
+
+      document.getElementById('tokenCount').textContent = tokens.filter(t => t.connected).length;
+    }
+
+    function switchToken(index) {
+      activeTokenIndex = index;
+      renderTokenList();
+      appendMessage('SYSTEM', `Active: ${tokens[index].name}`, new Date(), false, true);
+    }
+
+    function removeToken(index) {
+      if (tokens[index].socket) tokens[index].socket.close();
+      tokens.splice(index, 1);
+      if (activeTokenIndex >= tokens.length) activeTokenIndex = Math.max(0, tokens.length - 1);
+      renderTokenList();
+      saveTokens();
+    }
+
+    // Connect token
+    async function connectToken(index) {
+      const tokenData = tokens[index];
+      const token = tokenData.token;
+
+      try {
+        if (tokenData.socket) {
+          tokenData.socket.close();
+          if (heartbeatIntervals[index]) {
+            clearInterval(heartbeatIntervals[index]);
+            heartbeatIntervals[index] = null;
+          }
+        }
+        
+        const socket = new WebSocket('wss://gateway.discord.gg/?v=9&encoding=json');
+        tokenData.socket = socket;
+        
+        let sequence = null;
+
+        socket.onopen = () => {
+          socket.send(JSON.stringify({
+            op: 2,
+            d: {
+              token,
+              intents: 32767,
+              properties: {
+                "$os": "Windows",
+                "$browser": "Discord Client",
+                "$device": "desktop"
+              }
+            }
+          }));
+        };
+
+        socket.onmessage = ({ data }) => {
+          const payload = JSON.parse(data);
+          
+          if (payload.s) sequence = payload.s;
+          
+          if (payload.op === 10) {
+            tokenData.connected = true;
+            renderTokenList();
+            const heartbeatInterval = payload.d.heartbeat_interval;
+            startHeartbeat(socket, heartbeatInterval, index, () => sequence);
+          }
+          
+          if (payload.t === 'MESSAGE_CREATE') {
+            const msg = payload.d;
+            if (msg.channel_id === currentChannelId) {
+              const isMe = msg.author.id === tokenData.userId;
+              const authorName = isMe ? 'You' : msg.author.username;
+              
+              if (!isMe) {
+                appendMessage(authorName, msg.content || '', msg.timestamp, true, false, msg.attachments || []);
+                lastMessageId = msg.id;
+                
+                if (document.getElementById('autoReact')?.checked) {
+                  setTimeout(() => {
+                    reactToMessage(msg.id, emojis[Math.floor(Math.random() * emojis.length)]);
+                  }, 1000);
+                }
+              }
+            }
+          }
+          
+          if (payload.t === 'TYPING_START') {
+            if (payload.d.channel_id === currentChannelId && payload.d.user_id !== tokenData.userId) {
+              typingUsers.set(payload.d.user_id, Date.now());
+              updateTypingIndicator();
+              setTimeout(() => {
+                typingUsers.delete(payload.d.user_id);
+                updateTypingIndicator();
+              }, 8000);
+            }
+          }
+          
+          if (payload.t === 'MESSAGE_DELETE') {
+            deletedMessages.push({
+              id: payload.d.id,
+              channelId: payload.d.channel_id,
+              timestamp: new Date().toISOString()
+            });
+            appendMessage('SYSTEM', `🗑️ Message deleted: ${payload.d.id}`, new Date(), false, true);
+          }
+          
+          if (payload.t === 'MESSAGE_UPDATE' && payload.d.channel_id === currentChannelId) {
+            appendMessage('SYSTEM', `✏️ Message edited`, new Date(), false, true);
+          }
+        };
+
+        socket.onerror = () => {
+          tokenData.connected = false;
+          renderTokenList();
+        };
+
+        socket.onclose = (event) => {
+          tokenData.connected = false;
+          renderTokenList();
+          
+          if (heartbeatIntervals[index]) {
+            clearInterval(heartbeatIntervals[index]);
+            heartbeatIntervals[index] = null;
+          }
+          
+          if (event.code !== 1000) {
+            setTimeout(() => {
+              if (!tokenData.connected) connectToken(index);
+            }, 5000);
+          }
+        };
+      } catch (err) {
+        console.error(`Token error ${index}:`, err);
+        tokenData.connected = false;
+        renderTokenList();
+      }
+    }
+
+    function updateTypingIndicator() {
+      const chatArea = document.getElementById('chatArea');
+      let typingDiv = document.querySelector('.typing-indicator');
+      
+      if (typingUsers.size > 0) {
+        if (!typingDiv) {
+          typingDiv = document.createElement('div');
+          typingDiv.className = 'typing-indicator';
+          chatArea.appendChild(typingDiv);
+        }
+        typingDiv.textContent = `💬 ${typingUsers.size} typing...`;
+      } else {
+        if (typingDiv) typingDiv.remove();
+      }
+      
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function startHeartbeat(socket, interval, tokenIndex, getSequence) {
+      if (heartbeatIntervals[tokenIndex]) clearInterval(heartbeatIntervals[tokenIndex]);
+      
+      heartbeatIntervals[tokenIndex] = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          const seq = getSequence ? getSequence() : null;
+          socket.send(JSON.stringify({ op: 1, d: seq }));
+        }
+      }, interval);
+    }
+
+    // Load guilds
+    async function loadGuilds() {
+      if (tokens.length === 0) {
+        alert("No tokens!");
+        return;
+      }
+
+      const token = tokens[activeTokenIndex].token;
+      const list = document.getElementById('guildList');
+      list.innerHTML = '<div class="list-item">⏳ Loading...</div>';
+
+      try {
+        const guilds = await fetch('https://discord.com/api/v9/users/@me/guilds', {
+          headers: { Authorization: token }
+        }).then(r => r.json());
+
+        list.innerHTML = '';
+
+        for (const guild of guilds) {
+          const div = document.createElement('div');
+          div.className = 'list-item';
+          div.textContent = `📁 ${guild.name}`;
+          
+          div.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+              const channels = await fetch(`https://discord.com/api/v9/guilds/${guild.id}/channels`, {
+                headers: { Authorization: token }
+              }).then(r => r.json());
+
+              const textChannels = channels.filter(c => c.type === 0);
+              
+              if (textChannels.length > 0) {
+                showChannelModal(guild, textChannels);
+              } else {
+                alert("No text channels found");
+              }
+            } catch (err) {
+              alert("Error: " + err.message);
+            }
+          });
+          
+          list.appendChild(div);
+        }
+
+        appendMessage('SYSTEM', `✅ ${guilds.length} servers loaded`, new Date(), false, true);
+      } catch (err) {
+        list.innerHTML = '<div class="list-item">❌ Error</div>';
+      }
+    }
+
+    function showChannelModal(guild, channels) {
+      const modal = document.getElementById('channelModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const channelList = document.getElementById('channelListModal');
+      
+      modalTitle.textContent = `${guild.name} - Channels`;
+      channelList.innerHTML = '';
+      
+      channels.forEach(channel => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.textContent = `# ${channel.name}`;
+        div.onclick = () => {
+          openChannel(channel.id, `${guild.name} / #${channel.name}`);
+          closeChannelModal();
+          toggleMenu();
+        };
+        channelList.appendChild(div);
+      });
+      
+      modal.classList.add('show');
+    }
+
+    function closeChannelModal() {
+      document.getElementById('channelModal').classList.remove('show');
+    }
+
+    async function loadDMs() {
+      if (tokens.length === 0) {
+        alert("No tokens!");
+        return;
+      }
+
+      const token = tokens[activeTokenIndex].token;
+      
+      try {
+        const dms = await fetch('https://discord.com/api/v9/users/@me/channels', {
+          headers: { Authorization: token }
+        }).then(r => r.json());
+
+        const list = document.getElementById('dmList');
+        list.innerHTML = '';
+
+        dms.forEach(dm => {
+          const name = dm.recipients?.map(u => u.username).join(', ') || dm.name || 'Group';
+          const div = document.createElement('div');
+          div.className = 'list-item';
+          div.textContent = `💬 ${name}`;
+          div.onclick = () => {
+            openChannel(dm.id, name);
+            toggleMenu();
+          };
+          list.appendChild(div);
+        });
+
+        appendMessage('SYSTEM', `✅ ${dms.length} DMs loaded`, new Date(), false, true);
+      } catch (err) {
+        alert("DM load error");
+      }
+    }
+
+    async function openChannel(id, label) {
+      currentChannelId = id;
+      currentChannelName = label;
+      document.getElementById('channelInfo').textContent = label;
+      appendMessage('SYSTEM', `📍 Opened: ${label}`, new Date(), false, true);
+      await fetchLastMessages(true);
+    }
+
+    async function fetchLastMessages(silent = false) {
+      if (!currentChannelId || tokens.length === 0) {
+        if (!silent) alert("Open a channel first!");
+        return;
+      }
+
+      const token = tokens[activeTokenIndex].token;
+      
+      try {
+        const messages = await fetch(`https://discord.com/api/v9/channels/${currentChannelId}/messages?limit=50`, {
+          headers: { Authorization: token }
+        }).then(r => r.json());
+
+        if (!silent) {
+          document.getElementById('chatArea').innerHTML = '';
+          appendMessage('SYSTEM', `📜 ${messages.length} messages loaded`, new Date(), false, true);
+        }
+        
+        messages.reverse().forEach(msg => {
+          const isMe = msg.author.id === tokens[activeTokenIndex].userId;
+          const authorName = isMe ? 'You' : msg.author.username;
+          appendMessage(authorName, msg.content || '', msg.timestamp, !isMe, false, msg.attachments || []);
+          
+          if (!isMe) lastMessageId = msg.id;
+        });
+      } catch (err) {
+        if (!silent) appendMessage('SYSTEM', `❌ Error: ${err.message}`, new Date(), false, true);
+      }
+    }
+
+    // Flood System
+    function openFloodModal() {
+      document.getElementById('floodModal').classList.add('show');
+      document.getElementById('floodListInput').value = floodList.join('\n');
+      updateFloodDisplay();
+    }
+
+    function closeFloodModal() {
+      document.getElementById('floodModal').classList.remove('show');
+    }
+
+    function saveFloodList() {
+      const input = document.getElementById('floodListInput').value;
+      floodList = input.split('\n').filter(line => line.trim());
+      localStorage.setItem('vzdre_flood', JSON.stringify(floodList));
+      updateFloodDisplay();
+      appendMessage('SYSTEM', `✅ ${floodList.length} messages saved to flood list`, new Date(), false, true);
+    }
+
+    function loadFloodList() {
+      try {
+        const saved = localStorage.getItem('vzdre_flood');
+        if (saved) {
+          floodList = JSON.parse(saved);
+          updateFloodDisplay();
+        }
+      } catch (err) {
+        console.error('Flood load error:', err);
+      }
+    }
+
+    function updateFloodDisplay() {
+      document.getElementById('floodCount').textContent = floodList.length;
+      const display = document.getElementById('floodListDisplay');
+      display.innerHTML = '';
+      
+      floodList.slice(0, 10).forEach((msg, i) => {
+        const div = document.createElement('div');
+        div.className = 'flood-item';
+        div.innerHTML = `
+          <span>${i + 1}. ${msg.substring(0, 30)}${msg.length > 30 ? '...' : ''}</span>
+          <button class="small-btn" onclick="removeFloodItem(${i})">X</button>
+        `;
+        display.appendChild(div);
+      });
+      
+      if (floodList.length > 10) {
+        const more = document.createElement('div');
+        more.style.cssText = 'text-align: center; color: #666; font-size: 11px; margin-top: 5px;';
+        more.textContent = `+${floodList.length - 10} more...`;
+        display.appendChild(more);
+      }
+    }
+
+    function removeFloodItem(index) {
+      floodList.splice(index, 1);
+      localStorage.setItem('vzdre_flood', JSON.stringify(floodList));
+      updateFloodDisplay();
+    }
+
+    function toggleFloodMode() {
+      floodMode = !floodMode;
+      const btn = document.getElementById('floodModeBtn');
+      
+      if (floodMode) {
+        if (floodList.length === 0) {
+          alert("Flood list is empty! Add messages first.");
+          floodMode = false;
+          return;
+        }
+        btn.textContent = '⏸️ Stop Flood';
+        btn.classList.add('active');
+        appendMessage('SYSTEM', '🔥 FLOOD MODE ACTIVATED', new Date(), false, true);
+        startFloodSpam();
+      } else {
+        btn.textContent = '▶️ Start Flood';
+        btn.classList.remove('active');
+        appendMessage('SYSTEM', '⏸️ Flood mode stopped', new Date(), false, true);
+      }
+    }
+
+    async function startFloodSpam() {
+      while (floodMode) {
+        if (!currentChannelId) {
+          appendMessage('SYSTEM', '❌ No channel opened', new Date(), false, true);
+          floodMode = false;
+          document.getElementById('floodModeBtn').textContent = '▶️ Start Flood';
+          document.getElementById('floodModeBtn').classList.remove('active');
+          break;
+        }
+
+        let message;
+        if (document.getElementById('randomFromList')?.checked) {
+          message = floodList[Math.floor(Math.random() * floodList.length)];
+        } else {
+          message = floodList[messageCounter % floodList.length];
+          messageCounter++;
+        }
+
+        const mentions = document.getElementById('mentions').value.trim();
+        let finalMentions = mentions;
+
+        if (document.getElementById('varyPingCount')?.checked && mentions) {
+          const randomCount = Math.floor(Math.random() * pingMultiplier) + 1;
+          finalMentions = Array(randomCount).fill(mentions).join(' ');
+        }
+
+        if (document.getElementById('sendAllTokens')?.checked) {
+          const connectedTokens = tokens.filter(t => t.connected);
+          for (let i = 0; i < connectedTokens.length; i++) {
+            const actualIndex = tokens.indexOf(connectedTokens[i]);
+            await realSendMessage(message, finalMentions, actualIndex);
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+        } else {
+          await realSendMessage(message, finalMentions);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, Math.max(1, currentDelay)));
+      }
+    }
+
+    // MEV System
+    function toggleMEVMode() {
+      mevMode = !mevMode;
+      const btn = document.getElementById('mevBtn');
+      
+      if (mevMode) {
+        btn.textContent = '🚀 MEV Mode ON';
+        btn.classList.add('active');
+        appendMessage('SYSTEM', '⚡ MEV MODE: Maximum speed activated' + (mevSpeed === 0 ? ' <span class="speed-mode">INSTANT</span>' : ''), new Date(), false, true);
+      } else {
+        btn.textContent = '🚀 MEV Mode OFF';
+        btn.classList.remove('active');
+        appendMessage('SYSTEM', 'MEV mode disabled', new Date(), false, true);
+      }
+    }
+
+    // Message functions
+    function addMessageVariation(message) {
+      if (!document.getElementById('messageVariation')?.checked) return message;
+      
+      const chars = message.split('');
+      return chars.map(char => {
+        if (Math.random() > 0.7) {
+          return char + invisibleChars[Math.floor(Math.random() * invisibleChars.length)];
+        }
+        return char;
+      }).join('');
+    }
+
+    async function sendTyping(tokenIndex = activeTokenIndex) {
+      if (!currentChannelId) return;
+      
+      const token = tokens[tokenIndex].token;
+      try {
+        await fetch(`https://discord.com/api/v9/channels/${currentChannelId}/typing`, {
+          method: 'POST',
+          headers: { 'Authorization': token }
+        });
+      } catch (err) {
+        console.error('Typing error:', err);
+      }
+    }
+
+    async function sendLetterByLetter(content, mentions, tokenIndex) {
+      if (!document.getElementById('letterByLetter')?.checked) {
+        return realSendMessage(content, mentions, tokenIndex);
+      }
+
+      await sendTyping(tokenIndex);
+      
+      for (let i = 0; i < content.length; i++) {
+        if (i % 5 === 0) {
+          await sendTyping(tokenIndex);
+        }
+        await new Promise(resolve => setTimeout(resolve, letterDelay));
+      }
+      
+      return realSendMessage(content, mentions, tokenIndex);
+    }
+
+    function sendMessage() {
+      const content = document.getElementById('message').value.trim();
+      const mentions = document.getElementById('mentions').value.trim();
+      
+      if (!content) {
+        alert("Empty message!");
+        return;
+      }
+      
+      if (!currentChannelId) {
+        alert("Open a channel first!");
+        return;
+      }
+      
+      if (tokens.length === 0) {
+        alert("No tokens!");
+        return;
+      }
+
+      const displayContent = content + (mentions ? ` ${mentions}` : '');
+
+      if (pauseEnvoi) {
+        appendMessage('You (paused)', displayContent, new Date(), false, false);
+      } else {
+        appendMessage('You', displayContent, new Date(), false, false);
+        
+        if (document.getElementById('sendAllTokens')?.checked) {
+          const connectedTokens = tokens.filter(t => t.connected);
+          appendMessage('SYSTEM', `🔥 Sending with ${connectedTokens.length} tokens`, new Date(), false, true);
+          
+          connectedTokens.forEach((t, index) => {
+            const actualIndex = tokens.indexOf(t);
+            setTimeout(() => {
+              sendLetterByLetter(content, mentions, actualIndex);
+            }, index * (mevMode ? mevSpeed : 100));
+          });
+        } else {
+          sendLetterByLetter(content, mentions, activeTokenIndex);
+        }
+      }
+
+      document.getElementById('message').value = '';
+    }
+
+    async function realSendMessage(content, mentions, tokenIndex = activeTokenIndex) {
+      if (tokens.length === 0 || !tokens[tokenIndex] || !tokens[tokenIndex].connected) return;
+
+      // Auto-rotate if enabled
+      if (document.getElementById('autoRotate')?.checked) {
+        const connectedTokens = tokens.filter(t => t.connected);
+        if (connectedTokens.length > 1) {
+          rotateIndex = (rotateIndex + 1) % connectedTokens.length;
+          tokenIndex = tokens.indexOf(connectedTokens[rotateIndex]);
+          appendMessage('SYSTEM', `🔄 Rotated to: ${tokens[tokenIndex].name}`, new Date(), false, true);
+        }
+      }
+
+      // MEV Pre-send typing
+      if (mevMode && document.getElementById('preSendTyping')?.checked) {
+        await sendTyping(tokenIndex);
+      }
+
+      // MEV instant send
+      if (mevMode && document.getElementById('instantSend')?.checked) {
+        await new Promise(resolve => setTimeout(resolve, mevSpeed));
+      } else {
+        if (document.getElementById('antiSpamDetect')?.checked) {
+          await new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 100));
+        }
+      }
+
+      const token = tokens[tokenIndex].token;
+      
+      let finalContent = content;
+      if (document.getElementById('messageVariation')?.checked) {
+        finalContent = addMessageVariation(content);
+      }
+      
+      const fullContent = finalContent + (mentions ? ` ${mentions}` : '');
+
+      const headers = {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      };
+
+      const superProps = {
+        "os": "Windows",
+        "browser": "Discord Client",
+        "release_channel": "stable",
+        "client_version": "1.0.9162",
+        "os_version": "10.0.19045",
+        "client_build_number": 269465,
+        "client_event_source": null
+      };
+      headers['X-Super-Properties'] = btoa(JSON.stringify(superProps));
+
+      try {
+        const response = await fetch(`https://discord.com/api/v9/channels/${currentChannelId}/messages`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ content: fullContent })
+        });
+        
+        if (response.status === 429) {
+          const data = await response.json();
+          const retryAfter = (data.retry_after || 1) * 1000;
+          appendMessage('SYSTEM', `⚠️ Rate limit ${Math.ceil(retryAfter/1000)}s`, new Date(), false, true);
+          await new Promise(resolve => setTimeout(resolve, retryAfter + 500));
+          return realSendMessage(content, mentions, tokenIndex);
+        }
+        
+        if (!response.ok) {
+          appendMessage('SYSTEM', `❌ Error ${response.status}`, new Date(), false, true);
+          return;
+        }
+
+        const data = await response.json();
+        lastMessageId = data.id;
+        
+        if (document.getElementById('ghostMode')?.checked && data.id) {
+          setTimeout(() => {
+            deleteMessage(data.id, tokenIndex);
+          }, 2000);
+        }
+
+        const msgCountEl = document.getElementById('msgCount');
+        msgCountEl.textContent = parseInt(msgCountEl.textContent || '0') + 1;
+      } catch (err) {
+        appendMessage('SYSTEM', `❌ Error: ${err.message}`, new Date(), false, true);
+      }
+    }
+
+    async function deleteMessage(messageId, tokenIndex = activeTokenIndex) {
+      const token = tokens[tokenIndex].token;
+      try {
+        await fetch(`https://discord.com/api/v9/channels/${currentChannelId}/messages/${messageId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': token }
+        });
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    }
+
+    async function reactToMessage(messageId, emoji, tokenIndex = activeTokenIndex) {
+      const token = tokens[tokenIndex].token;
+      try {
+        const encodedEmoji = encodeURIComponent(emoji);
+        await fetch(`https://discord.com/api/v9/channels/${currentChannelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
+          method: 'PUT',
+          headers: { 'Authorization': token }
+        });
+      } catch (err) {
+        console.error("React error:", err);
+      }
+    }
+
+    async function massReactSpam() {
+      if (!lastMessageId) {
+        alert("No message found!");
+        return;
+      }
+
+      appendMessage('SYSTEM', '⚡ Mass React Spam...', new Date(), false, true);
+      
+      for (const emoji of emojis) {
+        if (document.getElementById('sendAllTokens')?.checked) {
+          tokens.forEach((t, index) => {
+            if (t.connected) {
+              setTimeout(() => reactToMessage(lastMessageId, emoji, index), index * 50);
+            }
+          });
+        } else {
+          await reactToMessage(lastMessageId, emoji);
+        }
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      appendMessage('SYSTEM', '✅ Mass React done', new Date(), false, true);
+    }
+
+    function togglePause() {
+      pauseEnvoi = !pauseEnvoi;
+      document.getElementById('pauseBtn').textContent = pauseEnvoi ? '▶️ Resume' : '⏸️ Pause';
+      appendMessage('SYSTEM', pauseEnvoi ? '⏸️ Paused' : '▶️ Resumed', new Date(), false, true);
+    }
+
+    function loadSpamFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        spamLines = e.target.result.split(/\r?\n/).filter(line => line.trim() !== "");
+        if (spamLines.length > 0) {
+          document.getElementById('startSpamBtn').style.display = 'block';
+          appendMessage('SYSTEM', `📄 ${spamLines.length} lines loaded`, new Date(), false, true);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    async function startAutoSpam() {
+      if (autoSpamming) {
+        autoSpamming = false;
+        document.getElementById('startSpamBtn').textContent = '▶️ Start';
+        document.getElementById('startSpamBtn').classList.remove('active');
+        return;
+      }
+
+      if (spamLines.length === 0) {
+        alert("Load a file first!");
+        return;
+      }
+
+      if (!currentChannelId) {
+        alert("Open a channel!");
+        return;
+      }
+
+      autoSpamming = true;
+      document.getElementById('startSpamBtn').textContent = '⏸️ Stop';
+      document.getElementById('startSpamBtn').classList.add('active');
+
+      let lineIndex = 0;
+      while (autoSpamming) {
+        const line = spamLines[lineIndex];
+        const mentions = document.getElementById('mentions').value.trim();
+        
+        appendMessage('You', line, new Date(), false, false);
+        
+        if (document.getElementById('sendAllTokens')?.checked) {
+          const sendPromises = tokens.map((t, index) => {
+            if (t.connected) return realSendMessage(line, mentions, index);
+          });
+          await Promise.all(sendPromises.filter(p => p));
+        } else {
+          await realSendMessage(line, mentions);
+        }
+        
+        lineIndex++;
+        if (lineIndex >= spamLines.length) lineIndex = 0;
+        
+        await new Promise(resolve => setTimeout(resolve, Math.max(1, currentDelay)));
+      }
+    }
+
+    async function nukeChannel() {
+      if (nukingChannel) {
+        nukingChannel = false;
+        document.getElementById('nukeBtn').textContent = '💣 NUKE';
+        document.getElementById('nukeBtn').classList.remove('active');
+        return;
+      }
+
+      if (!currentChannelId || tokens.length === 0) {
+        alert("Open a channel!");
+        return;
+      }
+
+      const confirm = window.confirm("⚠️ NUKE: Mass spam. Continue?");
+      if (!confirm) return;
+
+      nukingChannel = true;
+      document.getElementById('nukeBtn').textContent = '⛔ STOP';
+      document.getElementById('nukeBtn').classList.add('active');
+
+      const nukeMessages = ["💥", "🔥", "⚡", "💣", "⚠️", "🌪️"];
+
+      while (nukingChannel) {
+        const msg = nukeMessages[Math.floor(Math.random() * nukeMessages.length)];
+        
+        if (document.getElementById('sendAllTokens')?.checked) {
+          const sendPromises = tokens.map((t, index) => {
+            if (t.connected) return realSendMessage(msg, '', index);
+          });
+          await Promise.all(sendPromises.filter(p => p));
+        } else {
+          await realSendMessage(msg, '');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, Math.max(1, mevMode ? mevSpeed : currentDelay)));
+      }
+    }
+
+    async function scanServer() {
+      if (tokens.length === 0 || !currentChannelId) {
+        alert("Open a channel first!");
+        return;
+      }
+
+      const token = tokens[activeTokenIndex].token;
+      appendMessage('SYSTEM', '🔍 Scanning server...', new Date(), false, true);
+
+      try {
+        const channelInfo = await fetch(`https://discord.com/api/v9/channels/${currentChannelId}`, {
+          headers: { Authorization: token }
+        }).then(r => r.json());
+
+        if (!channelInfo.guild_id) {
+          appendMessage('SYSTEM', '❌ Not a server', new Date(), false, true);
+          return;
+        }
+
+        const guildId = channelInfo.guild_id;
+
+        const [guild, channels, members] = await Promise.all([
+          fetch(`https://discord.com/api/v9/guilds/${guildId}`, {
+            headers: { Authorization: token }
+          }).then(r => r.json()),
+          fetch(`https://discord.com/api/v9/guilds/${guildId}/channels`, {
+            headers: { Authorization: token }
+          }).then(r => r.json()),
+          fetch(`https://discord.com/api/v9/guilds/${guildId}/members?limit=1000`, {
+            headers: { Authorization: token }
+          }).then(r => r.json())
+        ]);
+
+        serverData = { guild, channels, members };
+
+        appendMessage('SYSTEM', `✅ ${guild.name}`, new Date(), false, true);
+        appendMessage('SYSTEM', `👥 ${members.length} members`, new Date(), false, true);
+        appendMessage('SYSTEM', `💬 ${channels.length} channels`, new Date(), false, true);
+      } catch (err) {
+        appendMessage('SYSTEM', `❌ Error: ${err.message}`, new Date(), false, true);
+      }
+    }
+
+    async function massMention() {
+      if (!serverData.members || serverData.members.length === 0) {
+        alert("Scan server first!");
+        return;
+      }
+
+      const mentions = serverData.members
+        .slice(0, 50)
+        .map(m => `<@${m.user.id}>`)
+        .join(' ');
+
+      realSendMessage('', mentions);
+      appendMessage('SYSTEM', `👥 ${Math.min(50, serverData.members.length)} mentions sent`, new Date(), false, true);
+    }
+
+    async function multiChannelSpam() {
+      if (!serverData.channels || serverData.channels.length === 0) {
+        alert("Scan server first!");
+        return;
+      }
+
+      const message = prompt("Message to spam:");
+      if (!message) return;
+
+      const textChannels = serverData.channels.filter(c => c.type === 0);
+      appendMessage('SYSTEM', `🌊 Spamming ${textChannels.length} channels...`, new Date(), false, true);
+
+      for (const channel of textChannels) {
+        try {
+          const oldChannelId = currentChannelId;
+          currentChannelId = channel.id;
+          await realSendMessage(message, '');
+          currentChannelId = oldChannelId;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (err) {
+          console.error(`Channel error:`, err);
+        }
+      }
+
+      appendMessage('SYSTEM', '✅ Multi-channel done', new Date(), false, true);
+    }
+
+    async function raidServer() {
+      if (!serverData.channels || serverData.members.length === 0) {
+        alert("Scan server first!");
+        return;
+      }
+
+      const confirm = window.confirm("⚠️ RAID SERVER: This will spam all channels with all tokens. Continue?");
+      if (!confirm) return;
+
+      appendMessage('SYSTEM', '☠️ RAID MODE ACTIVATED', new Date(), false, true);
+
+      const raidMessages = ["💀 RAIDED", "☠️ GET RAIDED", "⚡ NUKED", "🔥 DESTROYED"];
+      const textChannels = serverData.channels.filter(c => c.type === 0);
+
+      for (let i = 0; i < 10; i++) {
+        for (const channel of textChannels) {
+          const msg = raidMessages[Math.floor(Math.random() * raidMessages.length)];
+          
+          for (const token of tokens) {
+            if (token.connected) {
+              try {
+                const oldChannelId = currentChannelId;
+                currentChannelId = channel.id;
+                await realSendMessage(msg, '', tokens.indexOf(token));
+                currentChannelId = oldChannelId;
+              } catch (err) {
+                console.error('Raid error:', err);
+              }
+            }
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+
+      appendMessage('SYSTEM', '✅ Raid complete', new Date(), false, true);
+    }
+
+    function exportLogs() {
+      const logs = {
+        messages: messageHistory,
+        deletedMessages,
+        serverData,
+        floodList,
+        stats: {
+          messages: document.getElementById('msgCount').textContent,
+          tokens: tokens.length,
+          currentChannel: currentChannelName
+        },
+        exportedAt: new Date().toISOString()
+      };
+
+      const dataStr = JSON.stringify(logs, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `vzdre_logs_${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      appendMessage('SYSTEM', '💾 Logs exported', new Date(), false, true);
+    }
+
+    function resetStats() {
+      document.getElementById('msgCount').textContent = '0';
+      messageCounter = 0;
+      appendMessage('SYSTEM', '🔄 Stats reset', new Date(), false, true);
+    }
+
+    // Update sliders
+    document.getElementById('delayRange').addEventListener('input', (e) => {
+      currentDelay = parseInt(e.target.value);
+      document.getElementById('delayValue').textContent = currentDelay;
+    });
+
+    document.getElementById('letterDelayRange').addEventListener('input', (e) => {
+      letterDelay = parseInt(e.target.value);
+      document.getElementById('letterDelayValue').textContent = letterDelay;
+    });
+
+    document.getElementById('mevSpeedRange').addEventListener('input', (e) => {
+      mevSpeed = parseInt(e.target.value);
+      document.getElementById('mevSpeedValue').textContent = mevSpeed;
+    });
+
+    document.getElementById('pingMultRange').addEventListener('input', (e) => {
+      pingMultiplier = parseInt(e.target.value);
+      document.getElementById('pingMultValue').textContent = pingMultiplier;
+    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTokens();
+      loadFloodList();
+      
+      // Session timer
+      let sessionStart = Date.now();
+      setInterval(() => {
+        const elapsed = Math.floor((Date.now() - sessionStart) / 60000);
+        document.getElementById('sessionTime').textContent = elapsed + 'm';
+      }, 60000);
+      
+      appendMessage('SYSTEM', '🚀 VZDRE PRO INITIALIZED', new Date(), false, true);
+      appendMessage('SYSTEM', '⚡ Professional Edition - All features unlocked', new Date(), false, true);
+    });
+
+    // Enter to send
+    document.getElementById('message').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Auto-save
+    window.addEventListener('beforeunload', () => {
+      saveTokens();
+      localStorage.setItem('vzdre_flood', JSON.stringify(floodList));
+    });
+  </script>
+</body>
+</html>
